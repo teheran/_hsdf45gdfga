@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.Linq;
 
 namespace TestExercise
 {
@@ -9,16 +10,24 @@ namespace TestExercise
 
         public static IEnumerable<EmployeeWithDetails> EnumerateEmployeesWithNonEmptyDetails(IEnumerable<Employee> employees, IDetailsFactory detailsFactory)
         {
+            return EnumerateEmployeesWithNonEmptyDetails(employees, new[] { detailsFactory });
+        }
+
+        public static IEnumerable<EmployeeWithDetails> EnumerateEmployeesWithNonEmptyDetails(IEnumerable<Employee> employees, params IDetailsFactory[] detailsFactores)
+        {
             foreach (var e in employees)
             {
-                var details = detailsFactory.GetDetails(e);
-                if (!string.IsNullOrEmpty(details))
+                foreach(var r in detailsFactores)
                 {
-                    yield return new EmployeeWithDetails
+                    var details = r.GetDetails(e);
+                    if (!string.IsNullOrEmpty(details))
                     {
-                        Employee = e,
-                        Details = details
-                    };
+                        yield return new EmployeeWithDetails
+                        {
+                            Employee = e,
+                            Details = details
+                        };
+                    }
                 }
             }
         }
